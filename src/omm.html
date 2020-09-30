@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ZH generátor - Optimális mátrixszorzás</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td><label for="sizeMin">méret min:</label></td>
+                <td><input id="sizeMin" type="number" name="" value="2"></td>
+            </tr>
+            <tr>
+                <td><label for="sizeMax">méret max:</label></td>
+                <td><input id="sizeMax" type="number" name="" value="10"></td>
+            </tr>
+            <tr>
+                <td><label for="sizeFactor">méret faktor:</label></td>
+                <td><input id="sizeFactor" type="number" name="" value="5"></td>
+            </tr>
+            <tr>
+                <td><label for="sizeDistinct">egyedi méretek:</label></td>
+                <td><input id="sizeDistinct" type="checkbox" name="" checked></td>
+            </tr>
+            <tr>
+                <td><label for="matricesMin">mátrixok min:</label></td>
+                <td><input id="matricesMin" type="number" name="" value="5"></td>
+            </tr>
+            <tr>
+                <td><label for="matricesMax">mátrixok max:</label></td>
+                <td><input id="matricesMax" type="number" name="" value="10"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="random" type="button" name="button">Véletlen</button></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td><label for="sizes">méretek</label></td>
+                <td><input id="sizes" type="text" name="" value="25,30,10,5,10,15,20"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="solve" type="button" name="button">Old meg</button></td>
+            </tr>
+        </table>
+
+        <table style="font-family: monospace; font-size: large; text-align: right" id="solution" border="1"></<table>
+
+        <script src="common.js"></script>
+        <script src="omm.js"></script>
+
+    </body>
+</html>

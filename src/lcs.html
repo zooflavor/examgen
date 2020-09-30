@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ZH generátor - Leghosszabb közös részsorozat</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td><label for="alphabet">abc:</label></td>
+                <td><input id="alphabet" type="text" name="" value="01"></td>
+            </tr>
+            <tr>
+                <td><label for="min0">egyik min:</label></td>
+                <td><input id="min0" type="number" name="" value="4"></td>
+            </tr>
+            <tr>
+                <td><label for="max0">egyik max:</label></td>
+                <td><input id="max0" type="number" name="" value="8"></td>
+            </tr>
+            <tr>
+                <td><label for="min1">másik min:</label></td>
+                <td><input id="min1" type="number" name="" value="6"></td>
+            </tr>
+            <tr>
+                <td><label for="max1">másik max:</label></td>
+                <td><input id="max1" type="number" name="" value="10"></td>
+            </tr>
+            <tr>
+                <td><label for="commonMin">közös min:</label></td>
+                <td><input id="commonMin" type="number" name="" value="2"></td>
+            </tr>
+            <tr>
+                <td><label for="commonMax">közös max:</label></td>
+                <td><input id="commonMax" type="number" name="" value="3"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="random" type="button" name="button">Véletlen</button></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td><label for="value0">egyik:</label></td>
+                <td><input id="value0" type="text" name="" value="10011001"></td>
+            </tr>
+            <tr>
+                <td><label for="value1">másik:</label></td>
+                <td><input id="value1" type="text" name="" value="01010010"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="solve" type="button" name="button">Old meg</button></td>
+            </tr>
+        </table>
+
+        <table border="1">
+            <tr>
+                <td>leghosszabb:</td>
+                <td id="longest"></td>
+            </tr>
+            <tr>
+                <td>cellák:</td>
+                <td id="cells"></td>
+            </tr>
+            <tr>
+                <td>kritikus cellák:</td>
+                <td id="criticalCells"></td>
+            </tr>
+        </<table>
+
+        <table style="font-family: monospace; font-size: large" id="solution" border="1"></<table>
+
+        <script src="common.js"></script>
+        <script src="lcs.js"></script>
+    </body>
+</html>
