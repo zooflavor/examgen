@@ -1,3 +1,22 @@
+function allSolutions(cells, row, column) {
+    if (row>column) {
+        return "error";
+    }
+    if (row==column) {
+        return "A"+(row+1);
+    }
+    if (row+1==column) {
+        return "(A"+column+"*A"+(column+1)+")";
+    }
+    var result=[];
+    var cell=cells[row][column];
+    for (var ii=0; cell.split.length>ii; ++ii) {
+        var kk=cell.split[ii]-1;
+        result.push("("+allSolutions(cells, row, kk)+"*"+allSolutions(cells, kk+1, column)+")");
+    }
+    return result;
+}
+
 function random() {
     var matricesMax=parseInt(document.getElementById("matricesMax").value);
     var matricesMin=parseInt(document.getElementById("matricesMin").value);
@@ -37,18 +56,12 @@ function random() {
 function solve() {
     var sizes=document.getElementById("sizes").value.replace(/, +/g, ",").split(",").map(Number);
     var matrices=sizes.length-1;
-    var cells=Array(matrices);
-    for (var row=0; matrices>row; ++row) {
-        cells[row]=Array(matrices);
-        for (var column=0; matrices>column; ++column) {
-            cells[row][column]=null;
-        }
-    }
+    var cells=createMatrix(matrices, matrices, ()=>({}));
     for (var ii=0; matrices>ii; ++ii) {
-        cells[ii][ii]={fastest: 0, split: null};
+        cells[ii][ii]={fastest: 0, solutions: 1, split: null};
     }
     for (var ii=1; matrices>ii; ++ii) {
-        cells[ii-1][ii]={fastest: sizes[ii-1]*sizes[ii]*sizes[ii+1], split: null};
+        cells[ii-1][ii]={fastest: sizes[ii-1]*sizes[ii]*sizes[ii+1], solutions: 1, split: null};
     }
     for (var ii=2; matrices>ii; ++ii) {
         for (var jj=ii; matrices>jj; ++jj) {
@@ -56,37 +69,79 @@ function solve() {
             var column=jj;
             var fastest=null;
             var split=null;
+            var solutions=null;
             for (var kk=row; column>kk; ++kk) {
-                var speed=cells[row][kk].fastest+cells[kk+1][column].fastest+sizes[row]*sizes[kk+1]*sizes[column+1];
+                var c0=cells[row][kk];
+                var c1=cells[kk+1][column];
+                var speed=c0.fastest+c1.fastest+sizes[row]*sizes[kk+1]*sizes[column+1];
                 if ((null===fastest) || (fastest>speed)) {
                     fastest=speed;
-                    split=kk+1;
+                    split=[kk+1];
+                    solutions=c0.solutions*c1.solutions;
+                }
+                else if (fastest===speed) {
+                    split.push(kk+1);
+                    solutions+=c0.solutions*c1.solutions;
                 }
             }
-            cells[row][column]={fastest: fastest, split: split};
+            cells[row][column]={fastest: fastest, solutions: solutions, split: split};
         }
     }
-    var table=document.getElementById("solution");
-    while (0<table.children.length) {
-        table.removeChild(table.children[0]);
+    var textOutput=document.getElementById("text-output");
+    textOutput.value="";
+    textOutput.value+="Latex:\n\n";
+    textOutput.value+="Adottak az $";
+    for (var ii=0; matrices>ii; ++ii) {
+        if (0<ii) {
+            textOutput.value+=", ";
+        }
+        textOutput.value+="A_"+(ii+1);
     }
+    textOutput.value+="$ mátrixok,\nahol ";
+    for (var ii=0; matrices>ii; ++ii) {
+        if (0<ii) {
+            textOutput.value+=",\n";
+        }
+        textOutput.value+="az $A_"+(ii+1)+"$ mátrix $"+sizes[ii]+" \\times "+sizes[ii+1]+"$ dimenziós";
+    }
+    textOutput.value+=".\nHatározzuk meg a tanult dinamikus programozás algoritmus alkalmazásával az $";
+    for (var ii=0; matrices>ii; ++ii) {
+        if (0<ii) {
+            textOutput.value+=" ";
+        }
+        textOutput.value+="A_"+(ii+1);
+    }
+    textOutput.value+="$ szorzat azon zárójelezését,\namely minimalizálja a szorzat kiszámításához szükséges elemi szorzások számát.\nMinden számolást mellékelni kell!\n";
+    textOutput.value+="\nmegoldás:\n\n";
+    var dimensionsTable=createMatrix(3, matrices+1, ()=>[]);
+    dimensionsTable[1][0]=["sor"];
+    dimensionsTable[2][0]=["oszlop"];
+    for (var ii=0; matrices>ii; ++ii) {
+        dimensionsTable[0][ii+1]=["A"+(ii+1)];
+        dimensionsTable[1][ii+1]=[""+sizes[ii]];
+        dimensionsTable[2][ii+1]=[""+sizes[ii+1]];
+    }
+    textOutput.value+=generateTextTable(dimensionsTable, undefined, undefined);
+    textOutput.value+="\n";
+    var dpTable=createMatrix(matrices, matrices, ()=>([]));
     for (var row=0; matrices>row; ++row) {
-        var tableRow=document.createElement("tr");
         for (var column=0; matrices>column; ++column) {
             var cell=cells[row][column];
-            var tableData=document.createElement("td");
-            if (null!==cell) {
-                if (null==cell.split) {
-                    tableData.innerHTML=cell.fastest+"<br>&nbsp;";
+            if (null!=cell.fastest) {
+                lines=[""+cell.fastest];
+                if (null!=cell.split) {
+                    lines.push("k="+cell.split);
                 }
-                else {
-                    tableData.innerHTML=cell.fastest+"<br>k="+cell.split;
+                if ((null!=cell.solutions) && (1<cell.solutions)) {
+                    lines.push("s="+cell.solutions);
                 }
+                dpTable[row][column]=lines;
             }
-            tableRow.appendChild(tableData);
         }
-        table.appendChild(tableRow);
     }
+    textOutput.value+=generateTextTable(dpTable, 1, 1);
+    textOutput.value+="\nelemi szorzások minimális száma: "+cells[0][matrices-1].fastest+"\n";
+    textOutput.value+="\nösszes megoldás: "+allSolutions(cells, 0, matrices-1)+"\n";
 }
 
 document.getElementById("random").onclick=random;
