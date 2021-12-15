@@ -88,8 +88,7 @@ function solve() {
         }
     }
     var textOutput=document.getElementById("text-output");
-    textOutput.value="";
-    textOutput.value+="Latex:\n\n";
+    textOutput.value="Latex:\n\n";
     textOutput.value+="Adottak az $";
     for (var ii=0; matrices>ii; ++ii) {
         if (0<ii) {
@@ -121,7 +120,7 @@ function solve() {
         dimensionsTable[1][ii+1]=[""+sizes[ii]];
         dimensionsTable[2][ii+1]=[""+sizes[ii+1]];
     }
-    textOutput.value+=generateTextTable(dimensionsTable, undefined, undefined);
+    textOutput.value+=generateTextTable(dimensionsTable, undefined, undefined, 2);
     textOutput.value+="\n";
     var dpTable=createMatrix(matrices, matrices, ()=>([]));
     for (var row=0; matrices>row; ++row) {
@@ -139,7 +138,11 @@ function solve() {
             }
         }
     }
-    textOutput.value+=generateTextTable(dpTable, 1, 1);
+    var headers=[];
+    for (var ii=0; matrices>ii; ++ii) {
+        headers.push(""+(ii+1));
+    }
+    textOutput.value+=generateTextTable(dpTable, headers, headers, 3);
     textOutput.value+="\nelemi szorzások minimális száma: "+cells[0][matrices-1].fastest+"\n";
     textOutput.value+="\nösszes megoldás: "+allSolutions(cells, 0, matrices-1)+"\n";
 }

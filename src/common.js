@@ -31,19 +31,21 @@ function createMatrix(rows, columns, constr=()=>undefined) {
     return result;
 }
 
-function generateTextTable(matrix, rowHeaderStart=undefined, columnHeaderStart=undefined) {
+function generateTextTable(matrix, rowHeaders=undefined, columnHeaders=undefined, minWidth=2) {
     var rows=matrix.length;
     var columns=matrix[0].length;
     var maxHeights=createArray(rows, ()=>0);
-    var maxWidths=createArray(columns, ()=>0);
+    var maxWidths=createArray(columns, ()=>minWidth);
     var rowHeaderWidth=0;
-    if (columnHeaderStart) {
+    if (columnHeaders) {
         for (var cc=0; columns>cc; ++cc) {
-            maxWidths[cc]=Math.max(maxWidths[cc], (""+(columnHeaderStart+cc)).length);
+            maxWidths[cc]=Math.max(maxWidths[cc], columnHeaders[cc].length);
         }
     }
-    if (rowHeaderStart) {
-        rowHeaderWidth=Math.max(rowHeaderWidth, (""+(rowHeaderStart+rows-1)).length);
+    if (rowHeaders) {
+        for (var rr=0; rows>rr; ++rr) {
+            rowHeaderWidth=Math.max(rowHeaderWidth, rowHeaders[rr].length);
+        }
     }
     for (var rr=0; rows>rr; ++rr) {
         for (var cc=0; columns>cc; ++cc) {
@@ -54,20 +56,20 @@ function generateTextTable(matrix, rowHeaderStart=undefined, columnHeaderStart=u
         }
     }
     var result="";
-    function columnHeader() {
-        if (columnHeaderStart) {
+    function printColumnHeader() {
+        if (columnHeaders) {
             for (var ii=0; rowHeaderWidth>ii; ++ii) {
                 result+=" ";
             }
             result+=" ";
             for (var cc=0; columns>cc; ++cc) {
-                result+=alignCenter(maxWidths[cc], ""+(columnHeaderStart+cc));
+                result+=alignCenter(maxWidths[cc], columnHeaders[cc]);
                 result+=" ";
             }
             result+="\n";
         }
     }
-    function horizontalSeparator() {
+    function printHorizontalSeparator() {
         for (var ii=0; rowHeaderWidth>ii; ++ii) {
             result+=" ";
         }
@@ -83,13 +85,13 @@ function generateTextTable(matrix, rowHeaderStart=undefined, columnHeaderStart=u
         }
         result+="\n";
     }
-    columnHeader();
-    horizontalSeparator();
+    printColumnHeader();
+    printHorizontalSeparator();
     for (var rr=0; rows>rr; ++rr) {
         for (var ll=0; maxHeights[rr]>ll; ++ll) {
-            var printRowHeader=rowHeaderStart && (ll==Math.floor((maxHeights[rr]+1)/2)-1);
+            var printRowHeader=rowHeaders && (ll==Math.floor((maxHeights[rr]+1)/2)-1);
             if (printRowHeader) {
-                result+=alignCenter(rowHeaderWidth, ""+(rowHeaderStart+rr));
+                result+=alignCenter(rowHeaderWidth, rowHeaders[rr]);
             }
             else {
                 for (var ii=0; rowHeaderWidth>ii; ++ii) {
@@ -102,7 +104,7 @@ function generateTextTable(matrix, rowHeaderStart=undefined, columnHeaderStart=u
                 result+="|";
             }
             if (printRowHeader) {
-                result+=alignCenter(rowHeaderWidth, ""+(rowHeaderStart+rr));
+                result+=alignCenter(rowHeaderWidth, rowHeaders[rr]);
             }
             else {
                 for (var ii=0; rowHeaderWidth>ii; ++ii) {
@@ -111,9 +113,9 @@ function generateTextTable(matrix, rowHeaderStart=undefined, columnHeaderStart=u
             }
             result+="\n";
         }
-        horizontalSeparator();
+        printHorizontalSeparator();
     }
-    columnHeader();
+    printColumnHeader();
     return result;
 }
 
