@@ -1,3 +1,28 @@
+function allSolutions(cells, row, column, items) {
+    if ((0>=row) || (0>=column)) {
+        return [""];
+    }
+    var cell=cells[row][column];
+    var result=[];
+    for (var ii=0; cell.include.length>ii; ++ii) {
+        if (cell.include[ii]) {
+            var subsolutions=allSolutions(cells, row-1, column-items[row-1].weight, items);
+            for (var ii=0; subsolutions.length>ii; ++ii) {
+                var subsolution=subsolutions[ii];
+                if (0<subsolution.length) {
+                    subsolution+=",";
+                }
+                subsolution+=""+row;
+                result.push(subsolution);
+            }
+        }
+        else {
+            result=result.concat(allSolutions(cells, row-1, column, items));
+        }
+    }
+    return result;
+}
+
 function random() {
     var itemsMax=parseInt(document.getElementById("itemsMax").value);
     var itemsMin=parseInt(document.getElementById("itemsMin").value);
@@ -23,7 +48,7 @@ function random() {
 }
 
 function solve() {
-    var capacity=document.getElementById("capacity").value;
+    var capacity=parseInt(document.getElementById("capacity").value);
     var items=document.getElementById("items")
             .value
             .replace(/, +/g, ",")
@@ -31,6 +56,9 @@ function solve() {
             .map( pair => pair.replace(/; +/g, ";")
                     .split(";")
                     .map(Number));
+    for (var ii=0; items.length>ii; ++ii) {
+        items[ii]={value: items[ii][0], weight: items[ii][1]};
+    }
     var cells=Array(items.length+1);
     for (var row=0; items.length>=row; ++row) {
         cells[row]=Array(capacity+1);
@@ -44,48 +72,77 @@ function solve() {
             solve2(cc, cells, false, ii, items);
         }
     }
-    for (var ii=items.length, cc=capacity; 0<=ii; --ii) {
-        var cell=cells[ii][cc];
-        cell.solution=true;
-        cc=cell.up;
+    var textOutput=document.getElementById("text-output");
+    textOutput.value="Latex:\n\n";
+    textOutput.value+="Adott "+items.length+" tárgy, amelyek súlyát és értékét a következõ táblázat tartalmazza.\n";
+    textOutput.value+="\\bigskip\n\\begin{center}\n\\begin{tabular}{|c||";
+    for (var ii=0; items.length>ii; ++ii) {
+        textOutput.value+="c|";
     }
-    var table=document.getElementById("solution");
-    while (0<table.children.length) {
-        table.removeChild(table.children[0]);
+    textOutput.value+="}\n\\hline\n$i$";
+    for (var ii=0; items.length>ii; ++ii) {
+        textOutput.value+=" & "+(ii+1);
     }
-    var tableRow=document.createElement("tr");
-    var tableData=document.createElement("th");
-    tableData.innerHTML="i\\w";
-    tableRow.appendChild(tableData);
-    for (var ww=0; capacity>=ww; ++ww) {
-        tableData=document.createElement("th");
-        tableData.innerHTML=""+ww;
-        tableRow.appendChild(tableData);
+    textOutput.value+="\\\\\n\\hline\n$w_i$";
+    for (var ii=0; items.length>ii; ++ii) {
+        textOutput.value+=" & "+items[ii].weight;
     }
-    table.appendChild(tableRow);
+    textOutput.value+="\\\\\n\\hline\n$v_i$";
+    for (var ii=0; items.length>ii; ++ii) {
+        textOutput.value+=" & "+items[ii].value;
+    }
+    textOutput.value+="\\\\\n\\hline\n\\end{tabular}\n\\end{center}\n\\bigskip\n\\noindent\n";
+    textOutput.value+="A tanult dinamikus programozás algoritmussal határozzuk meg a tárgyaknak egy olyan részhalmazát,\n";
+    textOutput.value+="amelyben a tárgyak értékének összege a lehetõ legnagyobb, súlyuk összege viszont maximum "+capacity+".\n";
+    textOutput.value+="\nmegoldás:\n\n";
+    var itemsTable=createMatrix(3, items.length+1, ()=>[]);
+    itemsTable[1][0]=["súly"];
+    itemsTable[2][0]=["érték"];
+    for (var ii=0; items.length>ii; ++ii) {
+        itemsTable[0][ii+1]=[""+(ii+1)];
+        itemsTable[1][ii+1]=[""+items[ii].weight];
+        itemsTable[2][ii+1]=[""+items[ii].value];
+    }
+    textOutput.value+=generateTextTable(itemsTable, undefined, undefined, 3);
+    textOutput.value+="\n";
+    var dpTable=createMatrix(items.length+1, capacity+1, ()=>[]);
+    var rowHeaders=[];
     for (var ii=0; items.length>=ii; ++ii) {
-        tableRow=document.createElement("tr");
-        tableData=document.createElement("th");
-        tableData.innerHTML=""+ii;
-        tableRow.appendChild(tableData);
-        for (var cc=0; capacity>=cc; ++cc) {
-            var cell=cells[ii][cc];
-            tableData=document.createElement("td");
-            tableData.innerHTML=""+cell.value;
-            tableData.innerHTML+="<br>"
-                    +(cell.include?"+":"&nbsp;");
-            tableData.innerHTML+="<br>"
-                    +(null!==cell.up?"w="+cell.up:"&nbsp;");
-            if (cell.solution) {
-                tableData.style="color: blue";
-            }
-            else if (cell.critical) {
-                tableData.style="color: red";
-            }
-            tableRow.appendChild(tableData);
-        }
-        table.appendChild(tableRow);
+        rowHeaders.push(""+ii);
     }
+    var columnHeaders=[];
+    for (var ii=0; capacity>=ii; ++ii) {
+        columnHeaders.push(""+ii);
+    }
+    var criticalCells=0;
+    for (var rr=0; items.length>=rr; ++rr) {
+        for (var cc=0; capacity>=cc; ++cc) {
+            var cell=cells[rr][cc];
+            var lines=[""+cell.value];
+            var line="";
+            for (var ii=0; cell.include.length>ii; ++ii) {
+                line+=(cell.include[ii])?"+":"-";
+            }
+            if (cell.critical) {
+                line+="!";
+            }
+            if (0<line.length) {
+                lines.push(line);
+            }
+            if (1<cell.solutions) {
+                lines.push("s="+cell.solutions);
+            }
+            if (cell.critical) {
+                ++criticalCells;
+            }
+            dpTable[rr][cc]=lines;
+        }
+    }
+    textOutput.value+=generateTextTable(dpTable, rowHeaders, columnHeaders, 3);
+    textOutput.value+="\ncellák: "+(items.length+1)*(capacity+1)+"\n";
+    textOutput.value+="kritikus cellák: "+criticalCells+"\n";
+    textOutput.value+="legnagyobb érték: "+cells[items.length][capacity].value+"\n";
+    textOutput.value+="összes megoldás: "+allSolutions(cells, items.length, capacity, items).map(ss=>"("+ss+")")+"\n";
 }
 
 function solve2(capacity, cells, critical, item, items) {
@@ -93,34 +150,40 @@ function solve2(capacity, cells, critical, item, items) {
     if (null===cell) {
         if ((0===capacity) || (0===item)) {
             cell={
-                include: false,
-                up: capacity,
+                include: [],
+                solutions: 1,
                 value: 0};
         }
         else {
             var item2=items[item-1];
             var up=solve2(capacity, cells, critical, item-1, items);
-            if (capacity>=item2[1]) {
+            if (capacity>=item2.weight) {
                 var upLeft=solve2(
-                        capacity-item2[1], cells, critical, item-1,
+                        capacity-item2.weight, cells, critical, item-1,
                         items);
-                if (upLeft.value+item2[0]>up.value) {
+                if (upLeft.value+item2.value>up.value) {
                     cell={
-                        include: true,
-                        up: capacity-item2[1],
-                        value: upLeft.value+item2[0]};
+                        include: [true],
+                        solutions: upLeft.solutions,
+                        value: upLeft.value+item2.value};
+                }
+                else if (upLeft.value+item2.value===up.value) {
+                    cell={
+                        include: [false, true],
+                        solutions: up.solutions+upLeft.solutions,
+                        value: upLeft.value+item2.value};
                 }
                 else {
                     cell={
-                        include: false,
-                        up: capacity,
+                        include: [false],
+                        solutions: up.solutions,
                         value: up.value};
                 }
             }
             else {
                 cell={
-                    include: false,
-                    up: capacity,
+                    include: [false],
+                    solutions: up.solutions,
                     value: up.value};
             }
         }

@@ -103,11 +103,11 @@ function solve() {
     }
     var rowHeaders=["0"];
     for (var ii=0; value0.length>ii; ++ii) {
-        rowHeaders.push((ii+1)+"-"+value0[ii])
+        rowHeaders.push((ii+1)+"-"+value0[ii]);
     }
     var columnHeaders=["0"];
     for (var ii=0; value1.length>ii; ++ii) {
-        columnHeaders.push((ii+1)+"-"+value1[ii])
+        columnHeaders.push((ii+1)+"-"+value1[ii]);
     }
     textOutput.value+=generateTextTable(dpTable, rowHeaders, columnHeaders, 3);
     var criticalCells=0;
