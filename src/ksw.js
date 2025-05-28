@@ -95,7 +95,7 @@ function solve() {
     textOutput.value+="A tanult dinamikus programozás algoritmussal határozzuk meg a tárgyaknak egy olyan részhalmazát,\n";
     textOutput.value+="amelyben a tárgyak értékének összege a lehetõ legnagyobb, súlyuk összege viszont maximum "+capacity+".\n";
     textOutput.value+="\nmegoldás:\n\n";
-    textOutput.value+="\nkapacitáy: "+capacity+"\n\n";
+    textOutput.value+="\nkapacitás: "+capacity+"\n\n";
     var itemsTable=createMatrix(3, items.length+1, ()=>[]);
     itemsTable[1][0]=["súly"];
     itemsTable[2][0]=["érték"];

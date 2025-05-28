@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ZH generátor - Szekvenciaillesztés</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td><label for="value0">egyik:</label></td>
+                <td><input id="value0" type="text" name="" value="AATCGGCAT"></td>
+            </tr>
+            <tr>
+                <td><label for="value1">másik:</label></td>
+                <td><input id="value1" type="text" name="" value="CAATGTGAATC"></td>
+            </tr>
+            <tr>
+                <td><label for="costDeleteInsert">beszúrás/törlés:</label></td>
+                <td><input id="costDeleteInsert" type="number" name="" value="2"></td>
+            </tr>
+            <tr>
+                <td><label for="costReplace">csere:</label></td>
+                <td><input id="costReplace" type="number" name="" value="3"></td>
+            </tr>
+            <tr>
+                <td><label for="costEqual">egyenlő:</label></td>
+                <td><input id="costEqual" type="number" name="" value="0"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="solve" type="button" name="button">Old meg</button></td>
+            </tr>
+        </table>
+
+        <textarea id="text-output" style="font-family: monospace; font-size: large; width: 600px; height: 600px"></textarea>
+
+        <script src="common.js"></script>
+        <script src="sa.js"></script>
+    </body>
+</html>
